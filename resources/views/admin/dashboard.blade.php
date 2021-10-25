@@ -144,7 +144,7 @@
                with font-awesome or any other icon font library -->
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
-            <i class="fa fa-graduation-cap" aria-hidden="true"></i>
+            <i class="fa fa-graduation-cap text-info nav-icon" aria-hidden="true"></i>
               <p>
                 Programs
                 <i class="right fas fa-angle-left"></i>
@@ -174,7 +174,7 @@
 
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
-            <i class="fa fa-graduation-cap" aria-hidden="true"></i>
+            <i class="fa fa-list-ol text-danger nav-icon" aria-hidden="true"></i>
               <p>
                 Course Details
                 <i class="right fas fa-angle-left"></i>
@@ -198,7 +198,7 @@
 
           <li class="nav-item has-treeview">
             <a href="" class="nav-link">
-             <i class="fas fa-school    "></i>
+             <i class="fas fa-school  text-warning nav-icon "></i>
               <p>
                 Institutions
                 <i class="right fas fa-angle-left"></i>
@@ -227,7 +227,7 @@
           </li>
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
-             <i class="fa fa-user-plus" aria-hidden="true"></i>
+             <i class="fa fa-user-plus text-primary nav-icon" aria-hidden="true"></i>
               <p>
                 Users
                 <i class="fas fa-angle-left right"></i>
@@ -251,7 +251,7 @@
           </li>
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
-             <i class="fa fa-envelope" aria-hidden="true"></i>
+             <i class="fa fa-envelope text-info nav-icon" aria-hidden="true"></i>
               <p>
                 Messages
                 <i class="fas fa-angle-left right"></i>
@@ -277,6 +277,14 @@
                 </a>
               </li>
             </ul>
+          </li>
+          <li class="nav-item">
+          <a href="{{route('reports')}}" class="nav-link" >
+             <i class="nav-icon text-danger fas fa-chart-bar    "></i>
+              <p>
+              Reports
+              </p>
+            </a>
           </li>
           <li class="nav-item">
           <a href="#" class="nav-link" data-widget="control-sidebar" data-slide="true">

@@ -255,7 +255,7 @@
           </li>
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
-             <i class="fa fa-envelope" aria-hidden="true"></i>
+             <i class="fa fa-envelope nav-icon" aria-hidden="true"></i>
               <p>
                 Messages
                 <i class="fas fa-angle-left right"></i>

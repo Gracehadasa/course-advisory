@@ -11,6 +11,9 @@
 |
 */
 
+// use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Auth;
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -67,6 +70,7 @@ Route::post('/userreply/{id}', 'MessageController@postUserReply')->name('userrep
 Route::get('/users', 'HomeController@users')->name('users')->middleware('auth');
 Route::get('/deleteuser/{id}', 'HomeController@destroy')->name('deleteuser')->middleware('auth');
 Route::get('/allusers', 'HomeController@allusers')->name('allusers')->middleware('auth');
+Route::get('/reports', 'HomeController@reports')->name('reports')->middleware('auth');
 
 
 
