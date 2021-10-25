@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
             'role' => 1,
             'phone' => '0796431803',
             'email' => 'admin@gmail.com',
-            'index_no' => '00000000',
+            'index_no' => 'adminIndex',
             'password' => Hash::make('admin1234')
         ]);
     }
