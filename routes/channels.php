@@ -11,6 +11,15 @@
 |
 */
 
-Broadcast::channel('App.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Broadcast;
+
+// Broadcast::channel('App.User.{id}', function ($user, $id) {
+//     return (int) $user->id === (int) $id;
+// });
+Broadcast::channel('chat', function($user) {
+    return Auth::check();
+});
+Broadcast::channel('admin-{id}', function($user) {
+    return Auth::check();
 });

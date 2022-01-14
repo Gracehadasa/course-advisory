@@ -15,11 +15,10 @@ class CreateMessagesTable extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('userid');
-            $table->string('firstname');
-            $table->string('lastname');
-            $table->string('email');
-            $table->string('phone');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('receiver_id');
+            $table->foreign('receiver_id')->references('id')->on('users')->onDelete('cascade');
             $table->text('message');
             $table->boolean('readstatus')->default(false);
             $table->boolean('messagetype')->default(false);

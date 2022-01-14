@@ -103,7 +103,7 @@
             <!-- small box -->
             <div class="small-box bg-danger">
               <div class="inner">
-                <h3>{{App\Message::where([['readstatus','=',true],['messagetype','=',true],['userid','=',Auth::user()->id]])->count()}}</h3>
+                <h3>{{App\Message::where([['readstatus','=',true],['messagetype','=',true],['user_id','=',Auth::user()->id]])->count()}}</h3>
 
                 <p>Unread message</p>
               </div>

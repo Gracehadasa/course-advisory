@@ -52,37 +52,56 @@
                         </tbody>
                     </table>
 
-                    <div class="card-header mt-5 text-bold text-info">Subjects used for cluster calculations</div>
+                    <div class="card-header mt-5 text-bold text-info">Your results</div>
                     <table class="table table-bordered">
                         <thead>
-                            @foreach($clusterSubjects as $key => $subject)
-                            <th class="text-capitalize">{{$key}}</th>
-                            @endforeach
+                            <th>Name</th>
+                            <th>Mean Grade</th>
+                            <th>AGP</th>
                         </thead>
                         <tbody>
                             <tr>
-                                @foreach($clusterSubjects as $key => $subject)
-                                <td>{{$subject}}</td>
-                                @endforeach
+                                <td>{{Auth::user()->name}}</td>
+                                <td>{{$meanGrade}}</td>
+                                <td>{{$AGP}} points</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <table class="table">
+                <table class="table table-bordered">
                     <thead>
-                        <th>Name</th>
-                        <th>Mean Grade</th>
-                        <th>AGP</th>
+
                         <th>cluster</th>
+                        <td>Subjects</td>
                     </thead>
                     <tbody>
+                        @foreach($clusters as $i => $cluster)
                         <tr>
-                            <td>{{Auth::user()->name}}</td>
-                            <td>{{$meanGrade}}</td>
-                            <td>{{$AGP}} points</td>
-                            <td>{{$cluster}}</td>
+
+                            <td style="font-size: 40px; font-weight:100;">
+                                <div class="mb-0" style="height: 100%; display: flex; align-items:center; justify-content:center;">
+                                    {{$cluster}}
+                                </div>
+                            </td>
+                            <td>
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                        <tr>
+                                            @foreach($clusterSubjects[$i] as $key => $subject)
+                                            <th>{{ $key }}</th>
+                                            @endforeach
+                                        </tr>
+                                    </thead>
+                                    <tr>
+                                        @foreach($clusterSubjects[$i] as $key => $subject)
+                                        <td>{{$subject}}</td>
+                                        @endforeach
+                                    </tr>
+                                </table>
+                            </td>
 
                         </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>

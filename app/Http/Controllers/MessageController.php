@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\AdminSentMessage;
+use App\Events\MessageSentEvent;
 use App\Message;
+use App\User;
 use Illuminate\Http\Request;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
 {
@@ -15,11 +18,8 @@ class MessageController extends Controller
      */
     public function index()
     {
-        if(Auth::user()->role != 1){
-            return redirect()->route('home');
-         }
-        $messages = Message::all();
-        return view('admin.messages.all')->with("messages",$messages);
+        $id =Auth::id();
+        return Message::with('user')->where('user_id', $id)->orWhere('receiver_id', $id)->get();
     }
 
     /**
@@ -27,9 +27,14 @@ class MessageController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function liveChat()
     {
-        //
+        return view('dashboard.messages.livechat');
+    }
+
+    public function adminLiveChat()
+    {
+        return view('admin.messages.livechat');
     }
 
     /**
@@ -41,24 +46,43 @@ class MessageController extends Controller
     public function store(Request $request)
     {
         //validation
-        $this->validate($request,[
-            'firstname' => 'required',
-            'lastname' => 'required',
+        $this->validate($request, [
             'message' => 'required',
+            'user_id' => 'required'
         ]);
 
-        $message = new Message;
-        $message->userid = Auth::user()->id;
-        $message->firstname =$request->firstname;
-        $message->lastname = $request->lastname;
-        $message->email = Auth::user()->email;
-        $message->phone=Auth::user()->phone;
-        $message->message = $request->message;
-
-        $status = $message->save();
-        if($status){
-            return redirect()->back()->with("success","Message sent successifully. Please wait for our feedback");
+        $id =  $request->user_id;
+         
+        if($id === 'admin') {
+            $id = User::where('role', 1)->first()->id;
         }
+
+        // dd($id);
+
+        $user = Auth::user();
+
+        $message = $user->messages()->create([
+            'message' => $request->message,
+            'receiver_id' => $id
+        ]);
+
+        $message->load('user');
+
+
+        if ($user->role === 1) {
+          broadcast(new AdminSentMessage($message, $id))->toOthers();
+        } else {
+            broadcast(new MessageSentEvent($message))->toOthers();
+        }
+        
+
+
+
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'user' => $user
+        ]);
     }
 
     /**
@@ -69,20 +93,20 @@ class MessageController extends Controller
      */
     public function show(Message $message)
     {
-        if(Auth::user()->role != 1){
+        if (Auth::user()->role != 1) {
             return redirect()->route('home');
-         }
-        $messages = Message::where([['messagetype','=',false],['readstatus','=',false]])->get();
-        return view('admin.messages.messages')->with("messages",$messages);
+        }
+        $messages = Message::where([['messagetype', '=', false], ['readstatus', '=', false]])->get();
+        return view('admin.messages.messages')->with("messages", $messages);
     }
 
     public function showoutbox(Message $message)
     {
-        if(Auth::user()->role != 1){
+        if (Auth::user()->role != 1) {
             return redirect()->route('home');
-         }
-        $messages = Message::where([['messagetype','=',true],['readstatus','=',true]])->get();
-        return view('admin.messages.outbox')->with("messages",$messages);
+        }
+        $messages = Message::where([['messagetype', '=', true], ['readstatus', '=', true]])->get();
+        return view('admin.messages.outbox')->with("messages", $messages);
     }
 
     /**
@@ -94,17 +118,17 @@ class MessageController extends Controller
     public function edit($id)
     {
 
-        if(Auth::user()->role != 1){
+        if (Auth::user()->role != 1) {
             return redirect()->route('home');
-         }
+        }
         $replyMessage = Message::find($id);
-        return view('admin.messages.replyMessage')->with('message',$replyMessage);
+        return view('admin.messages.replyMessage')->with('message', $replyMessage);
     }
 
     public function userReply($id)
     {
         $replyMessage = Message::find($id);
-        return view('dashboard.messages.replyMessage')->with('message',$replyMessage);
+        return view('dashboard.messages.replyMessage')->with('message', $replyMessage);
     }
 
     /**
@@ -116,65 +140,65 @@ class MessageController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if(Auth::user()->role != 1){
+        if (Auth::user()->role != 1) {
             return redirect()->route('home');
-         }
+        }
         //validation
-        $this->validate($request,[
-            'message'=>'required'
+        $this->validate($request, [
+            'message' => 'required'
         ]);
 
-        $messageToReply = Message::where('id',$id)->get()->first();
+        $messageToReply = Message::where('id', $id)->get()->first();
         $messageToReply->readstatus = true;
         $updatestatus = $messageToReply->save();
 
-        if($updatestatus){
-        $message = new Message;
-        $message->userid = $messageToReply->userid;
-        $message->firstname =$messageToReply->firstname;
-        $message->lastname = $messageToReply->lastname;
-        $message->email = $messageToReply->email;
-        $message->phone=$messageToReply->phone;
-        $message->message = $request->message;
-        $message->messagetype = true;
-        $message->readstatus = true;
+        if ($updatestatus) {
+            $message = new Message;
+            $message->user_id = $messageToReply->user_id;
+            $message->firstname = $messageToReply->firstname;
+            $message->lastname = $messageToReply->lastname;
+            $message->email = $messageToReply->email;
+            $message->phone = $messageToReply->phone;
+            $message->message = $request->message;
+            $message->messagetype = true;
+            $message->readstatus = true;
 
-        $status = $message->save();
-        if($status){
-            return redirect()->back()->with("success","Message sent successifully. Please wait for our feedback");
-        }
+            $status = $message->save();
+            if ($status) {
+                return redirect()->back()->with("success", "Message sent successifully. Please wait for our feedback");
+            }
         }
     }
 
 
-    
+
 
     public function postUserReply(Request $request, $id)
     {
         //validation
-        $this->validate($request,[
-            'message'=>'required'
+        $this->validate($request, [
+            'message' => 'required'
         ]);
 
-        $messageToReply = Message::where('id',$id)->get()->first();
+        $messageToReply = Message::where('id', $id)->get()->first();
         $messageToReply->readstatus = false;
         $updatestatus = $messageToReply->save();
 
-        if($updatestatus){
-        $message = new Message;
-        $message->userid = $messageToReply->userid;
-        $message->firstname =$messageToReply->firstname;
-        $message->lastname = $messageToReply->lastname;
-        $message->email = $messageToReply->email;
-        $message->phone=$messageToReply->phone;
-        $message->message = $request->message;
-        $message->messagetype = false;
-        $message->readstatus = false;
+        if ($updatestatus) {
+            $message = new Message;
+            $message->user_id = $messageToReply->user_id;
+            $message->firstname = $messageToReply->firstname;
+            $message->lastname = $messageToReply->lastname;
+            $message->email = $messageToReply->email;
+            $message->phone = $messageToReply->phone;
+            $message->message = $request->message;
+            $message->messagetype = false;
+            $message->readstatus = false;
 
-        $status = $message->save();
-        if($status){
-            return redirect()->route('userSentMessages')->with("success","Message sent successifully. Please wait for our feedback");
-        }
+            $status = $message->save();
+            if ($status) {
+                return redirect()->route('userSentMessages')->with("success", "Message sent successifully. Please wait for our feedback");
+            }
         }
     }
     /**
@@ -187,19 +211,19 @@ class MessageController extends Controller
     {
         $deleteMessage = Message::find($id);
         $status = $deleteMessage->delete();
-        if($status){
-            return redirect()->back()->with("success","Message deleted successifull !!!");
+        if ($status) {
+            return redirect()->back()->with("success", "Message deleted successifull !!!");
         }
     }
     //User
     public function userSentMessages(Message $message)
     {
-        $messages = Message::where([['messagetype','=',false],['userid','=',Auth::user()->id]])->get();
-        return view('dashboard.messages.outbox')->with("messages",$messages);
+        $messages = Message::where([['messagetype', '=', false], ['user_id', '=', Auth::user()->id]])->get();
+        return view('dashboard.messages.outbox')->with("messages", $messages);
     }
     public function userInbox(Message $message)
     {
-        $messages = Message::where([['messagetype','=',true],['userid','=',Auth::user()->id]])->get();
-        return view('dashboard.messages.inbox')->with("messages",$messages);
+        $messages = Message::where([['messagetype', '=', true], ['user_id', '=', Auth::user()->id]])->get();
+        return view('dashboard.messages.inbox')->with("messages", $messages);
     }
 }

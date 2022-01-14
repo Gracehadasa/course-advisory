@@ -19,7 +19,26 @@ window.Vue = require('vue');
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
-Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+Vue.component('live-chat-component', require('./components/LiveChatComponent.vue').default);
+Vue.component('admin-live-chat-component', require('./components/AdminLiveChatComponent.vue').default);
+
+import VueChatScroll from 'vue-chat-scroll';
+Vue.use(VueChatScroll);
+
+import moment from 'moment';
+Vue.filter('dateToFromNowDaily', (myDate) => {
+	// const fromNow = moment(myDate).fromNow()
+	return moment(myDate).calendar(null, {
+		lastWeek: 'dddd, DD MMM YYYY',
+		lastDay: '[Yesterday]',
+		sameDay: '[Today]',
+		nextDay: '[Tomorrow]',
+		nextWeek: 'dddd',
+		sameElse() {
+			return 'DD MMM YYYY';
+		}
+	});
+});
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -28,5 +47,5 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
  */
 
 const app = new Vue({
-    el: '#app',
+	el: '#app'
 });

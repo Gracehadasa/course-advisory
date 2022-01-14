@@ -41,6 +41,13 @@ return [
             ],
         ],
 
+
+
+        'larasocket' => [
+            'driver' => 'larasocket',
+            'token' => env('LARASOCKET_TOKEN'),
+        ],
+
         'redis' => [
             'driver' => 'redis',
             'connection' => 'default',
