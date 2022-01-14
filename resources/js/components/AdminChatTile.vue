@@ -3,7 +3,6 @@
     <p class="my-chat__message">
       {{ message.message }}
     </p>
-    <p>{{message.user_id}}</p>
     <span class="my-chat__date">{{ message.created_at | dateToFromNowDaily }}</span>
   </div>
 </template>
